@@ -1,0 +1,55 @@
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import MChild
+from .serializers import MChileSerializer
+
+# Create your views here.
+
+@api_view(['POST'])
+def addFoundChild(request):
+        serializer=MChileSerializer(data=request.data)
+        # print("-----------", request.data["_content"])
+        if(serializer.is_valid()):
+            # print("-----------", serializer.data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Get'])
+def allFoundChild(request):
+        mchild = MChild.objects.all()
+        serializer=MChileSerializer(mchild, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['Get', 'Post'])
+def FoundChild(request):
+    if(request.method == 'POST'):
+        serializer=MChileSerializer(data=request.data)
+        if(serializer.is_valid()):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        mchild = MChild.objects.all()
+        serializer=MChileSerializer(mchild, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def nameFoundChild(request):
+    if request.method == 'POST':
+        # print("----------------", request.data)
+        mchild=MChild.objects.filter(name=request.data['name']).all()
+        serializer=MChileSerializer(mchild, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    mchild = MChild.objects.filter().all()
+    serializer=MChileSerializer(mchild, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def nameFoundChild(request, name):
+    if request.method == 'GET':
+        mchild=MChild.objects.filter(name=request.data[name]).all()
+        serializer=MChileSerializer(mchild)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
